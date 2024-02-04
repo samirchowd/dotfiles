@@ -15,40 +15,50 @@
     upgrade_homebrew_packages: false
 
   pre_tasks:
+    - name: Get my user
+      ansible.builtin.set_fact:
+        remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
+      become: false # Ensure this task runs without privilege escalation
+
     - name: Ensuring Homebrew Is Installed
       stat:
         path: /opt/homebrew/bin/brew
       register: homebrew_check
+      become: false # Run as the actual user to check Homebrew installation
 
     - name: Installing Homebrew
       shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       when: not homebrew_check.stat.exists and install_homebrew_if_missing
+      become: false # Run as the actual user to install Homebrew
 
   tasks:
     - name: Updating Homebrew
       homebrew:
         update_homebrew: true
       when: homebrew_check.stat.exists
+      become: yes
+      become_user: "{{ remote_regular_user }}"
 
     - name: Upgrading Homebrew Packages
       homebrew:
         upgrade_all: "{{ upgrade_homebrew_packages }}"
       when: homebrew_check.stat.exists and upgrade_homebrew_packages
+      become: yes
+      become_user: "{{ remote_regular_user }}"
 
     - name: Installing Homebrew Packages
       homebrew:
         name: "{{ brew_packages }}"
         state: present
       when: homebrew_check.stat.exists
-
-    - name: Get my user
-      ansible.builtin.set_fact:
-        remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
+      become: yes
+      become_user: "{{ remote_regular_user }}"
 
     - name: Change shell to zsh for the user
       ansible.builtin.user:
         name: "{{ remote_regular_user }}"
         shell: /usr/bin/zsh
+      become: yes # Requires root privileges to change the user's shell
 
     - name: Ensure fonts directory
       ansible.builtin.file:
@@ -56,12 +66,14 @@
         state: directory
         mode: "0755"
         owner: "{{ remote_regular_user }}"
+      become: yes # Ensuring directory permissions may require elevated privileges
 
     - name: Check if JetBrains Mono exists
       ansible.builtin.shell: "ls ~{{ remote_regular_user }}/.fonts/JetBrainsMonoNerd*FontMono*"
       register: jetbrains_mono_exists
       ignore_errors: true
       changed_when: false
+      become: false # Check performed as the user
 
     - name: Download JetBrains Mono
       when: jetbrains_mono_exists is failed
@@ -71,4 +83,5 @@
         remote_src: true
         mode: "0755"
         owner: "{{ remote_regular_user }}"
+      become: yes # Downloading and extracting the font may require elevated privileges
 
