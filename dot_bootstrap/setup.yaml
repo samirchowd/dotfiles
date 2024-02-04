@@ -1,83 +1,54 @@
 ---
-- name: Machine setup
+- name: Unified MacOS Machine Setup
   hosts: localhost
   become: true
   connection: local
   gather_facts: true
+  vars:
+    brew_packages:
+      - git
+      - pyenv
+      - wget
+      - htop
+      - zsh
+    install_homebrew_if_missing: true
+    upgrade_homebrew_packages: false
+
+  pre_tasks:
+    - name: Ensuring Homebrew Is Installed
+      stat:
+        path: /opt/homebrew/bin/brew
+      register: homebrew_check
+
+    - name: Installing Homebrew
+      shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when: not homebrew_check.stat.exists and install_homebrew_if_missing
 
   tasks:
+    - name: Updating Homebrew
+      homebrew:
+        update_homebrew: true
+      when: homebrew_check.stat.exists
+
+    - name: Upgrading Homebrew Packages
+      homebrew:
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      when: homebrew_check.stat.exists and upgrade_homebrew_packages
+
+    - name: Installing Homebrew Packages
+      homebrew:
+        name: "{{ brew_packages }}"
+        state: present
+      when: homebrew_check.stat.exists
+
     - name: Get my user
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 
-    - name: Install packages
-      ansible.builtin.dnf:
-        name:
-          - git
-          - htop
-          - vim
-          - gh
-          - gcc
-          - ripgrep
-          - poetry
-          - zsh
-          - fzf
-          - tmux
-          - ffmpeg-free
-          - zlib
-          - zlib-devel
-          - make
-          - patch
-          - bzip2
-          - bzip2-devel
-          - readline-devel
-          - openssl-devel
-          - libffi-devel
-          - xz-devel
-          - luarocks
-          - fd-find
-          - gcc-c++
-          - autoconf
-          - unar
-        state: present
-
-    - name: Change shell to zsh
+    - name: Change shell to zsh for the user
       ansible.builtin.user:
         name: "{{ remote_regular_user }}"
         shell: /usr/bin/zsh
-
-    - name: Install DNF plugins core
-      ansible.builtin.dnf:
-        name: dnf-plugins-core
-        state: present
-
-    - name: Add Visual Studio Code Repo
-      ansible.builtin.yum_repository:
-        name: vscode
-        description: Visual Studio Code
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        gpgcheck: true
-        enabled: true
-
-    - name: Install VS Code
-      ansible.builtin.dnf:
-        name: code
-        state: present
-
-    - name: Install DNF plugins core
-      ansible.builtin.dnf:
-        name: dnf-plugins-core
-        state: present
-
-    - name: Add Visual Studio Code Repo
-      ansible.builtin.yum_repository:
-        name: vscode
-        description: Visual Studio Code
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        gpgcheck: true
-        enabled: true
 
     - name: Ensure fonts directory
       ansible.builtin.file:
@@ -86,13 +57,13 @@
         mode: "0755"
         owner: "{{ remote_regular_user }}"
 
-    - name: Check if Jetbrains Mono exists
+    - name: Check if JetBrains Mono exists
       ansible.builtin.shell: "ls ~{{ remote_regular_user }}/.fonts/JetBrainsMonoNerd*FontMono*"
       register: jetbrains_mono_exists
       ignore_errors: true
       changed_when: false
 
-    - name: Download Jetbrains mono
+    - name: Download JetBrains Mono
       when: jetbrains_mono_exists is failed
       ansible.builtin.unarchive:
         src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip
@@ -100,3 +71,4 @@
         remote_src: true
         mode: "0755"
         owner: "{{ remote_regular_user }}"
+
