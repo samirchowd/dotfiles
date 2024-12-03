@@ -1,0 +1,116 @@
+# ~~~~~~~~~~~~~~~ Plugin Manager ~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Set the directory we want to store zinit and plugins
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+
+
+# Download Zinit, if it's not there yet
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+
+source "${ZINIT_HOME}/zinit.zsh"
+
+# ~~~~~~~~~~~~~~~ Plugins ~~~~~~~~~~~~~~~~~~~~~~~~
+
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light Aloxaf/fzf-tab
+
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::aws
+
+HB_CNF_HANDLER="$(brew --repository)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+if [ -f "$HB_CNF_HANDLER" ]; then
+source "$HB_CNF_HANDLER";
+fi
+zinit snippet OMZP::command-not-found
+
+# Load completions
+autoload -U compinit && compinit
+
+# Completion Styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)EZA_COLORS}"
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --color $realpath'
+
+eval "$(fzf --zsh)"
+eval "$(zoxide init --cmd cd zsh)"
+
+# ~~~~~~~~~~~~~~~ Environment Variables ~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Set to superior editing mode
+
+set -o vi
+
+export VISUAL=nvim
+export EDITOR=nvim
+export TERM="tmux-256color"
+
+export BROWSER="chrome"
+
+# ~~~~~~~~~~~~~~~ Path configuration ~~~~~~~~~~~~~~~~~~~~~~~~
+
+path=(
+    $path                           # Keep existing PATH entries
+    $HOME/bin
+    $HOME/.local/bin
+)
+
+# Remove duplicate entries and non-existent directories
+typeset -U path
+path=($^path(N-/))
+
+export PATH
+
+# ~~~~~~~~~~~~~~~ History ~~~~~~~~~~~~~~~~~~~~~~~~
+
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+
+setopt HIST_IGNORE_SPACE  # Don't save when prefixed with space
+setopt HIST_IGNORE_DUPS   # Don't save duplicate lines
+setopt SHARE_HISTORY      # Share history between sessions
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_FIND_NO_DUPS
+
+# ~~~~~~~~~~~~~~~ Keybindings ~~~~~~~~~~~~~~~~~~~~~~~~
+
+bindkey -e 
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+
+# ~~~~~~~~~~~~~~~ Aliases ~~~~~~~~~~~~~~~~~~~~~~~~
+
+alias vim="nvim"
+alias vi="nvim"
+alias zshconfig="source ~/.zshrc"
+alias ls="eza -laghm@ --all --icons --git --color=always"
+
+# ~~~~~~~~~~~~~~~ Prompt ~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Check if oh-my-posh is installed
+if ! command -v oh-my-posh &> /dev/null; then
+  if command -v brew &> /dev/null; then
+    echo "oh-my-posh not found, installing via Homebrew..."
+    brew install oh-my-posh
+  else
+    echo "Homebrew not found, installing oh-my-posh via curl..."
+    curl -s https://ohmyposh.dev/install.sh | bash -s
+  fi
+fi
+
+# Only initialize oh-my-posh if not in Apple Terminal
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+  eval "$(oh-my-posh init zsh)"
+fi
+
+neofetch
+
+# Setting up terminal prompt
+eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/gruvbox.json)"
+
+
