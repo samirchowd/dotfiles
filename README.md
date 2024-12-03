@@ -46,3 +46,4 @@ chezmoi init --apply samirchowd
 - [ ] Create cross-platform zshrc 
 - [ ] Install dependencies through chezmoi/ansible w/ cross platform support 
 - [ ] Post screenshots and demos
+- [ ] Add bat
