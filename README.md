@@ -40,7 +40,7 @@ chezmoi init --apply samirchowd
 ```
 
 ## TODOs
-- [] Disable `cd` fuzzy find
-- [] Create cross-platform zshrc 
-- [] Install dependencies through chezmoi/ansible w/ cross platform support 
-- [] Post screenshots and demos
+- [ ] Disable `cd` fuzzy find
+- [ ] Create cross-platform zshrc 
+- [ ] Install dependencies through chezmoi/ansible w/ cross platform support 
+- [ ] Post screenshots and demos
