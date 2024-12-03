@@ -8,13 +8,21 @@ I try to keep this config as minimal as possible but with enough bells and whist
 Install the follwing dependencies with your favorite package manager
 
 [chezmoi](https://www.chezmoi.io/)
+
 [kitty](https://sw.kovidgoyal.net/kitty/)
+
 [tmux](https://github.com/tmux/tmux/wiki)
+
 [eza](https://github.com/eza-community/eza)
+
 [fzf](https://github.com/junegunn/fzf)
+
 [git](https://github.com/git/git)
+
 [oh-my-posh](https://ohmyposh.dev/)
+
 [neovim](https://neovim.io/)
+
 [zoxide](https://github.com/ajeetdsouza/zoxide)
 
 ## Installation 
