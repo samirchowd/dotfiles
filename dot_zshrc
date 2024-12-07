@@ -79,7 +79,6 @@ setopt HIST_FIND_NO_DUPS
 
 # ~~~~~~~~~~~~~~~ Keybindings ~~~~~~~~~~~~~~~~~~~~~~~~
 
-bindkey -e 
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
 
@@ -89,10 +88,6 @@ alias vim="nvim"
 alias vi="nvim"
 alias zshconfig="source ~/.zshrc"
 alias ls="eza -laghm@ --all --icons --git --color=always"
-alias gig="kitten ssh dev-dsk-samirtho-2b-f1d92a46.us-west-2.amazon.com"
-alias giga="dev-dsk-samirtho-2b-f1d92a46.us-west-2.amazon.com"
-alias arm="kitten ssh dev-dsk-samirtho-2a-8d66e7d0.us-west-2.amazon.com"
-alias arma="dev-dsk-samirtho-2a-8d66e7d0.us-west-2.amazon.com"
 
 # ~~~~~~~~~~~~~~~ Prompt ~~~~~~~~~~~~~~~~~~~~~~~~
 
