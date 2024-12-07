@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Check if Homebrew/Linuxbrew is installed
+if ! command -v brew &>/dev/null; then
+    echo "Homebrew/Linuxbrew is not installed. Installing it first..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Ensure brew is up to date
+echo "Updating Homebrew..."
+brew update
+
+# List of packages to install
+packages=(
+    tmux
+    eza
+    fzf
+    git
+    oh-my-posh
+    neovim
+    zoxide
+)
+
+# Install each package
+echo "Installing packages..."
+for package in "${packages[@]}"; do
+    if ! brew list --formula | grep -q "^$package\$"; then
+        echo "Installing $package..."
+        brew install "$package"
+    else
+        echo "$package is already installed."
+    fi
+done
+
+# Install tmux tpm (Tmux Plugin Manager)
+echo "Setting up Tmux Plugin Manager (TPM)..."
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    echo "TPM installed successfully."
+else
+    echo "TPM is already installed."
+fi
+
+# Install JetBrains Mono Nerd Font
+echo "Installing JetBrains Mono Nerd Font..."
+if ! brew list --cask | grep -q "^font-jetbrains-mono-nerd-font\$"; then
+    brew tap homebrew/cask-fonts
+    brew install --cask font-jetbrains-mono-nerd-font
+else
+    echo "JetBrains Mono Nerd Font is already installed."
+fi
+
+# Post-installation actions
+echo "Setting up FZF..."
+"$(brew --prefix)/opt/fzf/install" --all --no-bash --no-zsh
+
+echo "Installation complete."
+

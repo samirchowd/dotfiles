@@ -1,0 +1,23 @@
+packages:
+  darwin:
+    brews:
+    - 'tmux'
+    - 'eza'
+    - 'fzf'
+    - 'git'
+    - 'oh-my-posh'
+    - 'neovim'
+    - 'zoxide'
+    casks:
+    - 'font-jetbrains-mono-nerd-font'
+
+  linux:
+    brews:
+    - 'tmux'
+    - 'eza'
+    - 'fzf'
+    - 'git'
+    - 'oh-my-posh'
+    - 'neovim'
+    - 'zoxide'
+
