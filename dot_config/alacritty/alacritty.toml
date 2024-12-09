@@ -1,0 +1,36 @@
+general.import = [
+    "~/.config/alacritty/themes/themes/gruvbox-dark.toml"
+]
+
+[env] 
+TERM = "xterm-256color"
+
+[window] 
+padding.x = 10 
+padding.y = 10 
+
+decorations = "Buttonless"
+
+opacity = 0.7 
+blur = true
+
+option_as_alt = "Both" 
+
+[font] 
+size=18
+
+[font.bold]
+family = "JetBrainsMono NF"
+style = "Bold"
+
+[font.bold_italic]
+family = "JetBrainsMono NF"
+style = "Bold Italic"
+
+[font.italic]
+style = "Italic"
+
+[font.normal]
+family = "JetBrainsMono NF"
+style = "Regular"
+
