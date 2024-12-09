@@ -34,3 +34,7 @@ style = "Italic"
 family = "JetBrainsMono NF"
 style = "Regular"
 
+[terminal.shell]
+program = "/bin/bash"  # Replace with your shell (e.g., /bin/zsh or /bin/bash)
+args = ["--login", "-c", "tmux attach || tmux new"]
+
